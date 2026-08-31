@@ -4,10 +4,6 @@ import os
 import shutil
 import time
 from pathlib import Path
-from pprint import pprint
-from pathlib import Path
-import argparse
-
 
 extension_mapping = {'image': ['png', 'gif', 'jpg', 'jpeg', 'psd', 'pxd', 'heic', 'webp', 'tif', 'tiff'],
                      'ignore': ['DS_Store', 'swp', 'localized', 'exe', 'bak'],
@@ -41,10 +37,10 @@ def main(dir, move=True, age=True, doprune=True, verbose=False):
             if len(files_moved) < 1:
                 print(f"No files moved in {dir}")
             else:
-                move_metrics = {key: 0 for key in extension_mapping.keys()}
+                move_metrics = {key: 0 for key in extension_mapping}
                 move_metrics['unknown'] = 0
                 move_metrics['screenshot'] = 0
-                for filename in files_moved.keys():
+                for filename in files_moved:
                     try:
                         cat = data[filename.replace(f"{dir}/", '')]['type']
                         move_metrics[cat] += 1
@@ -120,10 +116,10 @@ def scandir(dir, screen_shot=True):
                       'modified': (now - statinfo.st_mtime) / 86400.0,  # in fractional hours
                       'accessed': (now - statinfo.st_atime) / 86400.0,  # in fractional hours
                       }
-        if screen_shot and (file.startswith('Screen Shot') or file.startswith('Screenshot')):
+        if screen_shot and (file.startswith(('Screen Shot', 'Screenshot'))):
             data[file]['type'] = "screenshot"
         else:
-            for t in extension_mapping.keys():
+            for t in extension_mapping:
                 for ext in extension_mapping[t]:
                     if file.lower().endswith(f".{ext.lower()}"):
                         data[file]['type'] = t
@@ -145,7 +141,7 @@ def age_dir(data, dirpath, dirname, metric_to_use='accessed', use_parent=False, 
     aged_files = {}
     for filename, details in data.items():
         details['newdir'] = None
-        jkl = details[metric_to_use]
+        details[metric_to_use]
         if details[metric_to_use] >= 360:
             details['newdir'] = 'year+'
         elif details[metric_to_use] >= 180:
@@ -243,9 +239,9 @@ if __name__ == '__main__':
     parser.add_argument('--skip_desktop', action='store_true', help=f'skip cleaning {home}/Desktop')
     parser.add_argument('--skip_downloads', action='store_true', help=f'skip cleaning {home}/Downloads')
     parser.add_argument('--skip_Stellarium', action='store_true', help=f'skip cleaning {home}/Pictures/Stellarium')
-    parser.add_argument('--skip_tmp', action='store_true', help=f'skip cleaning /tmp')
-    parser.add_argument('--silent', action='store_true', help=f'avoid output to STDOUT')
-    parser.add_argument('directory', nargs='?', help=f'fullpath to directory to organize (optional)')
+    parser.add_argument('--skip_tmp', action='store_true', help='skip cleaning /tmp')
+    parser.add_argument('--silent', action='store_true', help='avoid output to STDOUT')
+    parser.add_argument('directory', nargs='?', help='fullpath to directory to organize (optional)')
     args = parser.parse_args()
 
     directories = []
